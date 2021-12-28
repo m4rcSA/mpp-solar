@@ -35,19 +35,33 @@ class AbstractDevice(ABC):
         self._name = get_kwargs(kwargs, "name")
         self._port = get_port(**kwargs)
         self._protocol = get_protocol(get_kwargs(kwargs, "protocol"))
-        log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}")
+        pause_loops = get_kwargs(kwargs, "pause_loops")
+        if pause_loops is None:
+            self._pause_loops = 0
+        else:
+            self._pause_loops = int(pause_loops)
+        self._current_loop = 0
+        log.debug(f"__init__ name {self._name}, port {self._port}, protocol {self._protocol}, loops {self._pause_loops}")
 
     def __str__(self):
         """
         Build a printable representation of this class
         """
-        return f"{self._classname} device - name: {self._name}, port: {self._port}, protocol: {self._protocol}"
+        return f"{self._classname} device - name: {self._name}, port: {self._port}, protocol: {self._protocol}, pause_loops: {self._pause_loops}"
+
 
     def run_command(self, command) -> dict:
         """
         generic method for running a 'raw' command
         """
         log.info(f"Running command {command}")
+
+        if self._current_loop < self._pause_loops:
+            log.debug(f"on loop {self._current_loop} of {self._pause_loops} not running")
+            self._current_loop += 1
+            return None
+        else:
+            self._current_loop = 0;
 
         if self._protocol is None:
             log.error("Attempted to run command with no protocol defined")

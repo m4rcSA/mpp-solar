@@ -254,10 +254,10 @@ def main():
     if args.daemon:
         import time
 
-        import systemd.daemon
+        from systemd.daemon import notify, Notification
 
         # Tell systemd that our service is ready
-        systemd.daemon.notify("READY=1")
+        notify(Notification.READY)
         print("Service Initializing ...")
         # set some default-defaults
         pause = 60
@@ -301,6 +301,7 @@ def main():
             porttype = config[section].get("porttype", fallback=None)
             filter = config[section].get("filter", fallback=None)
             excl_filter = config[section].get("exclfilter", fallback=None)
+            pause_loops = config[section].get("pause_loops", fallback=0)
             udp_port = config[section].get("udpport", fallback=None)
             postgres_url = config[section].get("postgres_url", fallback=None)
             mongo_url = config[section].get("mongo_url", fallback=None)
@@ -321,6 +322,7 @@ def main():
                 postgres_url=postgres_url,
                 mongo_url=mongo_url,
                 mongo_db=mongo_db,
+                pause_loops=pause_loops,
             )
             # build array of commands
             commands = _command.split("#")
@@ -408,7 +410,7 @@ def main():
             # for item in mppUtilArray:
             # Tell systemd watchdog we are still alive
             if args.daemon:
-                systemd.daemon.notify("WATCHDOG=1")
+                notify(Notification.WATCHDOG)
                 print(
                     f"Getting results from device: {_device} for command: {_command}, tag: {_tag}, outputs: {_outputs}"
                 )
@@ -443,7 +445,7 @@ def main():
                 )
                 # Tell systemd watchdog we are still alive
         if args.daemon:
-            systemd.daemon.notify("WATCHDOG=1")
+            notify(Notification.WATCHDOG)
             print(f"Sleeping for {pause} sec")
             time.sleep(pause)
         else:
