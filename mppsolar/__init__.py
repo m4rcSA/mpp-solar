@@ -430,7 +430,7 @@ def main():
                     f"Getting results from device: {device}"
                 )
             for command in device.get_commands():
-                results = device.run_command(command)
+                results = device.run_command(command["command"])
                 log.debug(f"results: {results}")
                 # send to output processor(s)
                 outputs = get_outputs(device.outputs)
@@ -440,8 +440,8 @@ def main():
                     log.debug(f"Using output filter: {filter}")
                     op.output(
                         data=results,
-                        tag=command, #not sure how tags are supposed to work
-                        mqtt_topic=device.get_mqtt_output_topic(),
+                        tag=command["command"], #not sure how tags are supposed to work
+                        mqtt_topic=command["topic"],
                         mqtt_broker=mqtt_broker,
                         udp_port=udp_port,
                         postgres_url=postgres_url,
