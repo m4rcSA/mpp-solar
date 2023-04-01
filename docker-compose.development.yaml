@@ -1,33 +1,31 @@
 services:
-  mosquitto:
-    image: eclipse-mosquitto
-    network_mode: host
-    volumes:
-      - ./docker/mosquitto/config:/mosquitto/config
-      - ./docker/mosquitto/data:/mosquitto/data
-      - ./docker/mosquitto/log:/mosquitto/log
+#  mosquitto:
+#    image: eclipse-mosquitto
+#    network_mode: host
+#    volumes:
+#      - ./docker/mosquitto/config:/mosquitto/config
+#      - ./docker/mosquitto/data:/mosquitto/data
+#      - ./docker/mosquitto/log:/mosquitto/log
 
   mppsolar:
-    network_mode: host
+#    network_mode: host
     devices:
-     - /dev/hidraw0:/dev/hidraw0
+     - /dev/ttyUSB0:/dev/ttyUSB0
     volumes:
     #Bind over the configuration
       - type: bind
-        source: ./docker/
+        source: /etc/mpp-solar/
         target: /etc/mpp-solar
     #Bind the code
       - type: bind
-        source: .
+        source: /opt/mpp-solar/
         target: /mpp-solar
-    build: 
+    build:
       dockerfile: Dockerfile.development
+    pull_policy: build
     entrypoint:
-      - mpp-solar
+      - powermon
       - -C
-      - /etc/mpp-solar/mpp-solar.conf #Available due to volume binding above
-      - --daemon
-    depends_on:
-      - mosquitto
-
-
+      - /etc/mpp-solar/powermon.yaml #Available due to volume binding above
+#    depends_on:
+#      - mosquitto
