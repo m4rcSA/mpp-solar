@@ -10,7 +10,7 @@ services:
   mppsolar:
 #    network_mode: host
     devices:
-     - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB0:/dev/ttyUSB0
     volumes:
     #Bind over the configuration
       - type: bind
