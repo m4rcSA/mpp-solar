@@ -7,12 +7,12 @@ from time import sleep, time
 
 import yaml
 
-from mppsolar.libs.mqttbrokerc import MqttBroker
-from mppsolar.libs.daemon import Daemon
-from mppsolar.sender import output_results
-from mppsolar.ports import get_port
 from mppsolar.protocols import get_protocol
 from mppsolar.version import __version__  # noqa: F401
+from powermon.libs.daemon import Daemon
+from powermon.libs.mqttbroker import MqttBroker
+from powermon.ports import get_port
+from powermon.transports import output_results
 
 # from mppsolar.inout import get_port
 
@@ -52,17 +52,17 @@ def mqtt_callback(client, userdata, msg):
     ADHOC_COMMANDS.append(newCommand)
 
 
-def readConfigFile(configFile=None):
-    _config = {}
-    if configFile is not None:
+def readYamlFile(yamlFile=None):
+    _yaml = {}
+    if yamlFile is not None:
         try:
-            with open(configFile, "r") as stream:
-                _config = yaml.safe_load(stream)
+            with open(yamlFile, "r") as stream:
+                _yaml = yaml.safe_load(stream)
         except yaml.YAMLError as exc:
-            log.error(f"Error processing config file: {exc}")
+            log.error(f"Error processing yaml file: {exc}")
         except FileNotFoundError as exc:
-            log.error(f"Error opening config file: {exc}")
-    return _config
+            log.error(f"Error opening yaml file: {exc}")
+    return _yaml
 
 
 def processCommandLineOverrides(args):
@@ -137,7 +137,7 @@ def main():
     # build config - start with defaults
     config = yaml.safe_load(sample_config)
     # build config - update with details from config file
-    config.update(readConfigFile(args.configFile))
+    config.update(readYamlFile(args.configFile))
     # build config - override with any command line arguments
     config.update(processCommandLineOverrides(args))
 
